@@ -1,22 +1,17 @@
-import csv
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-from multiprocessing import Pool, cpu_count
-import pandas as pd
 
 def main(username, password, rating=5):
-    
     url = "https://feedback.manipal.edu/sfdfacultyfeedback/login_stud.aspx"
     service_url = "https://feedback.manipal.edu/Services_Feedback/login_mpl.aspx"
     print("[+] For {}".format(username))
-    dr = webdriver.Firefox()
+    dr = webdriver.Chrome(executable_path="./chromedriver.exe")
 
     def login(username=username, password=password):
         dr.get(url)
         uname_ele = dr.find_element_by_id("ContentPlaceHolder2_TxtRegno")
         pass_ele = dr.find_element_by_id("ContentPlaceHolder2_TxtPwd")
         submit_ele = dr.find_element_by_id("ContentPlaceHolder2_Submit")
-        uname_ele.send_keys(username)
         uname_ele.clear()
         uname_ele.send_keys(username)
         pass_ele.clear()
@@ -74,56 +69,8 @@ def main(username, password, rating=5):
         print(e)
         dr.close()
         return
-        # dr.get(service_url)
-        # service_login()
-        # not_error = True
-        # while not_error:
-        #     not_error = fill_services()
-        
 
-filename = "Untitled form.csv"
-df = pd.read_csv(filename)
-args_list = df[[df.columns[-3],df.columns[-2],df.columns[-1]]].values
-args_list = [[str(args[0]), str(args[1]), str(args[2])] for args in args_list]
-
-def run_parallel_selenium_processes(datalist, selenium_func):
-
-    pool = Pool()
-
-    # max number of parallel process
-    ITERATION_COUNT = cpu_count()-1
-
-    count_per_iteration = len(datalist) / float(ITERATION_COUNT)
-
-    for i in range(0, ITERATION_COUNT):
-        list_start = int(count_per_iteration * i)
-        list_end = int(count_per_iteration * (i+1))
-        pool.apply_async(selenium_func, [datalist[list_start:list_end]])
-
-if __name__=='__main__':
-    try:
-        with open('save','r') as f:
-            count = int(f.read())
-    except FileNotFoundError:
-        count = 0
-    pool = Pool()
-    args_list = args_list[count:]
-    print(args_list)
-    for arg in args_list:
-        pool.apply_async(main, arg)
-    pool.close()
-    pool.join()
-    # run_parallel_selenium_processes(args_list, main)
-
-
-"""
-for c in range(count, len(args_list)):
-    args = args_list[count]
-    main(str(args[0]), str(args[1]), str(args[2]))
-    with open('save','w') as f:
-        count+=1
-        f.write(str(count))
-"""
-
-
-
+roll_no = input("Roll number: ")
+password = input("Password: ")
+rating = int(input("Rating:(1-5): "))
+main(roll_no, password, rating)
